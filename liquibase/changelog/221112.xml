@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+        logicalFilePath="221112.xml">
+
+    <changeSet id="221112-1" author="alsturm">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="telegram_user"/>
+            </not>
+        </preConditions>
+        <createTable tableName="telegram_user">
+            <column name="id" type="BIGINT"><constraints nullable="false" primaryKey="true" primaryKeyName="telegram_user_pkey"/></column>
+            <column name="first_name" type="VARCHAR(255)"/>
+            <column name="is_bot" type="BOOLEAN"><constraints nullable="false"/></column>
+            <column name="join_date" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="language_code" type="VARCHAR(255)"/>
+            <column name="last_name" type="VARCHAR(255)"/>
+            <column name="username" type="VARCHAR(255)"/>
+            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

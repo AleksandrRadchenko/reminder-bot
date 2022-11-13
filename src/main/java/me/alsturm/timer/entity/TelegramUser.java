@@ -8,13 +8,15 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.time.Instant;
 
 /**
  * Would rather use com.pengrad.telegrambot.model.User but it
  * has no constructors or setters.
  */
-//@Entity
+@Entity
 @Builder(toBuilder=true)
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,7 +25,7 @@ import java.time.Instant;
 @Accessors(chain = true)
 @ToString
 public class TelegramUser {
-//    @Id
+    @Id
     private Long id;
     private boolean isBot;
     private String firstName;

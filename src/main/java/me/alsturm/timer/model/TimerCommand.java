@@ -4,6 +4,7 @@ import java.util.stream.Stream;
 
 public enum TimerCommand {
     START("start"),
+    STOP("stop"),
     HELP("help"),
     TIMER("t"),
     UNKNOWN("Unknown command");

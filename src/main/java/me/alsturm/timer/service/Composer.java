@@ -27,6 +27,6 @@ public class Composer {
     }
 
     public String composeStart() {
-        return "Greetings! See /help for details.";
+        return "Won't forget to remind you. Will remind for you not to forget! See /help for details.";
     }
 }

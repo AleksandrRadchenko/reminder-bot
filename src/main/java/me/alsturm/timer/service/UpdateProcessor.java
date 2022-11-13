@@ -25,17 +25,19 @@ import java.util.regex.Pattern;
 public class UpdateProcessor {
     private final TimerProperties properties;
     private final Notifier notifier;
+    private final TelegramUserService telegramUserService;
 
     private final ObjectMapper objectMapper = new ObjectMapper().setVisibility(PropertyAccessor.FIELD,
             JsonAutoDetect.Visibility.ANY);
 
     public UpdateProcessor(TimerProperties properties,
-                           Notifier notifier) {
+                           Notifier notifier,
+                           TelegramUserService telegramUserService) {
         this.properties = properties;
         this.notifier = notifier;
+        this.telegramUserService = telegramUserService;
     }
 
-//    @Transactional
     public void process(Update update) {
         Message message = update.message();
         TelegramUser user = TelegramUserConverter.fromUser(message.from());
@@ -47,6 +49,7 @@ public class UpdateProcessor {
             TimerCommand command = TimerCommand.from(text);
             switch (command) {
                 case START -> start(user);
+                case STOP -> stop(user);
                 case HELP -> help(user);
                 case TIMER -> setTimer(user, text);
                 default -> notifier.notifyUnknownCommand(user, text);
@@ -55,7 +58,12 @@ public class UpdateProcessor {
     }
 
     private void start(TelegramUser user) {
+        user = telegramUserService.activateUser(user);
         notifier.notifyStart(user);
+    }
+
+    private void stop(TelegramUser user) {
+        telegramUserService.deactivateUser(user);
     }
 
     private void help(TelegramUser user) {
