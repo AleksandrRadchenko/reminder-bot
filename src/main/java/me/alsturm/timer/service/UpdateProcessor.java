@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("unused")
 @Service
 @Slf4j
 public class UpdateProcessor {
@@ -121,7 +122,7 @@ public class UpdateProcessor {
      * Example: /timer 4 Wake up -> TimerCommand(4, "Wake up")
      */
     Optional<DelayedMessage> parseForDelayedMessage(String text) {
-        Pattern pattern = Pattern.compile("/([a-zA-Z]+)(?:[\\t ]+(\\d*))?(?:[\\t ]+([\\s\\S]+))?$");
+        Pattern pattern = Pattern.compile("/([a-zA-Zа-яА-Я]+)(?:[\\t ]+(\\d*))?(?:[\\t ]+([\\s\\S]+))?$");
         Matcher matcher = pattern.matcher(text);
         if (matcher.find()) {
             Duration delay = matcher.group(2) != null

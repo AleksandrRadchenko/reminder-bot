@@ -1,24 +1,30 @@
 package me.alsturm.timer.model;
 
-import java.util.stream.Stream;
+import java.util.List;
 
 public enum TimerCommand {
+    TIMER("t", "е"), // е - cyrillic
+    HELP("help"),
     START("start"),
     STOP("stop"),
-    HELP("help"),
-    TIMER("t"),
     UNKNOWN("Unknown command");
 
-    TimerCommand(String text) {
-        this.text = text;
+    TimerCommand(String... aliases) {
+        this.aliases = List.of(aliases);
     }
 
-    public final String text;
+    public final List<String> aliases;
 
     public static TimerCommand from(String text) {
-        return Stream.of(TimerCommand.values())
-                .filter(c -> text.toLowerCase().startsWith("/" + c.text.toLowerCase()))
-                .findFirst()
-                .orElse(UNKNOWN);
+        for (TimerCommand command : TimerCommand.values()) {
+            if (command.aliasIsBeginningOf(text)) {
+                return command;
+            }
+        }
+        return UNKNOWN;
+    }
+
+    private boolean aliasIsBeginningOf(String text) {
+        return this.aliases.stream().anyMatch(alias -> text.toLowerCase().startsWith("/" + alias.toLowerCase()));
     }
 }

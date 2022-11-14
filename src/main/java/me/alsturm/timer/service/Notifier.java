@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.ZoneId;
 
+@SuppressWarnings("unused")
 @Slf4j
 @Service
 public class Notifier {
@@ -40,7 +41,7 @@ public class Notifier {
 
     public void notifyUnknownCommand(TelegramUser user, String text) {
         log.warn("Unknown command: '{}' from user {}", text, user.toShortString());
-        send(user, TimerCommand.UNKNOWN.text);
+        send(user, TimerCommand.UNKNOWN.aliases.get(0));
     }
 
     public void notifyError(TelegramUser user, String details) {
