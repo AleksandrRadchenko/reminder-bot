@@ -4,13 +4,16 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.response.SendResponse;
 import lombok.extern.slf4j.Slf4j;
 import me.alsturm.timer.config.TimerProperties;
 import me.alsturm.timer.entity.TelegramUser;
 import me.alsturm.timer.mapper.TelegramUserConverter;
 import me.alsturm.timer.model.DelayedMessage;
+import me.alsturm.timer.model.SettingsCommand;
 import me.alsturm.timer.model.TimerCommand;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +22,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static me.alsturm.timer.model.SettingsCommand.DEFAULT_DELAY_REQUEST;
 
 @SuppressWarnings("unused")
 @Service
@@ -40,22 +45,54 @@ public class UpdateProcessor {
     }
 
     public void process(Update update) {
-        Message message = update.message();
-        TelegramUser user = TelegramUserConverter.fromUser(message.from());
-        String text = message.text();
-        log.info("User {}, message: \"{}\"", user.toShortString(), text);
-        if (message.replyToMessage() != null) {
-            postpone(user, message);
-        } else {
+        if (update.callbackQuery() != null) {
+            CallbackQuery callbackQuery = update.callbackQuery();
+            SettingsCommand command = SettingsCommand.from(callbackQuery.data());
+            TelegramUser user = TelegramUserConverter.fromUser(callbackQuery.from());
+            switch (command) {
+                case DEFAULT_DELAY -> setDefaultDelay(user);
+                case DEFAULT_MESSAGE -> setDefaultMessage(user);
+                default -> notifier.notifyUnknownCommand(user, "");
+            }
+        } else if (update.message() != null && update.message().replyToMessage() != null) {
+            TelegramUser user = TelegramUserConverter.fromUser(update.message().from());
+            String text = update.message().text();
+            String replyToMessageText = update.message().replyToMessage().text();
+            SettingsCommand command = SettingsCommand.from(replyToMessageText);
+            switch (command) {
+                case DEFAULT_DELAY_REQUEST -> updateDefaultDelay(user, text);
+                case DEFAULT_MESSAGE_REQUEST -> updateDefaultMessage(user, text);
+                default -> postpone(user, text);
+            }
+        } else if (update.message() != null) {
+            Message message = update.message();
+            TelegramUser user = TelegramUserConverter.fromUser(message.from());
+            String text = message.text();
+            log.info("User {}, message: \"{}\"", user.toShortString(), text);
             TimerCommand command = TimerCommand.from(text);
             switch (command) {
                 case START -> start(user);
                 case STOP -> stop(user);
                 case HELP -> help(user);
                 case TIMER -> setTimer(user, text);
+                case SET -> settings(user);
                 default -> notifier.notifyUnknownCommand(user, text);
             }
+        } else {
+            log.warn("Won't handle update: {}", update);
         }
+    }
+
+    private void updateDefaultDelay(TelegramUser user, String text) {
+
+    }
+
+    private void setDefaultDelay(TelegramUser user) {
+        notifier.queryForDefaultDelay(user);
+    }
+
+    private void setDefaultMessage(TelegramUser user) {
+        notifier.queryForDefaultMessage(user);
     }
 
     private void start(TelegramUser user) {
@@ -74,8 +111,7 @@ public class UpdateProcessor {
     /**
      * Postpone for n minutes 'replyToMessage'
      */
-    private void postpone(TelegramUser user, Message message) {
-        String text = message.text();
+    private void postpone(TelegramUser user, String text) {
         Optional<Duration> mayBeDuration = parseForDuration(text);
         if (mayBeDuration.isPresent()) {
             DelayedMessage delayedMessage = new DelayedMessage(mayBeDuration.get(), message.replyToMessage().text());
@@ -95,6 +131,11 @@ public class UpdateProcessor {
         } else {
             notifier.notifyUnknownCommand(user, text);
         }
+    }
+
+    private void settings(TelegramUser user) {
+        SendResponse sendResponse = notifier.queryForSettings(user);
+        sendResponse.message();
     }
 
     /**
