@@ -4,6 +4,7 @@ import java.util.List;
 
 public enum TimerCommand {
     TIMER("t", "е"), // е - cyrillic
+    SET("set", "ыуе"),
     HELP("help"),
     START("start"),
     STOP("stop"),

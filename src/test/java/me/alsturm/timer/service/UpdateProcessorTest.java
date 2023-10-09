@@ -1,6 +1,6 @@
 package me.alsturm.timer.service;
 
-import me.alsturm.timer.config.TimerProperties;
+import me.alsturm.timer.entity.TelegramUser;
 import me.alsturm.timer.model.DelayedMessage;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -24,16 +24,18 @@ import static org.mockito.Mockito.lenient;
 @ExtendWith(MockitoExtension.class)
 class UpdateProcessorTest {
     @Mock
-    TimerProperties timerProperties;
+    UserSettingsService userSettingsService;
     @InjectMocks
     UpdateProcessor updateProcessor;
 
     @ParameterizedTest
     @ArgumentsSource(TimerCommandArgumentProvider.class)
     void parseTimerCommand(String command, Optional<DelayedMessage> parsedCommand) {
-        lenient().when(timerProperties.getDefaultDelay()).thenReturn(Duration.ofMinutes(30));
+        TelegramUser user = new TelegramUser().setId(1L);
+        lenient().when(userSettingsService.getDefaultDelay(user)).thenReturn(Duration.ofMinutes(30));
+        lenient().when(userSettingsService.getDefaultMessage(user)).thenReturn("Пора размяться");
 
-        Optional<DelayedMessage> actualParsedCommand = updateProcessor.parseForDelayedMessage(command);
+        Optional<DelayedMessage> actualParsedCommand = updateProcessor.parseForDelayedMessage(user, command);
 
         assertThat(actualParsedCommand).isEqualTo(parsedCommand);
     }

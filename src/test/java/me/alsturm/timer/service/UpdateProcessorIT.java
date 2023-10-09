@@ -25,12 +25,15 @@ class UpdateProcessorIT extends IntegrationTestBase {
     UpdateProcessor updateProcessor;
     @Autowired
     TelegramUserRepository telegramUserRepository;
+    @Autowired
+    TelegramUserConverter telegramUserConverter;
 
     @Mock
     Update update;
     @Mock
     Message message;
-    User mockUser = new MockUser(1L)
+    private final Long mockUserId = 1L;
+    User mockUser = new MockUser(mockUserId)
             .setIsBot(true)
             .setFirstName("NotABot")
             .setLastName("Ivanov")
@@ -41,8 +44,6 @@ class UpdateProcessorIT extends IntegrationTestBase {
             .setCanJoinGroups(true)
             .setCanReadAllGroupMessages(true)
             .setSupportsInlineQueries(true);
-
-    private final Long stubUserId = 1L;
 
     @BeforeEach
     void init() {
@@ -56,20 +57,20 @@ class UpdateProcessorIT extends IntegrationTestBase {
 
         updateProcessor.process(update);
 
-        TelegramUser actualUser = telegramUserRepository.findById(stubUserId).get();
-        TelegramUser expectedUser = TelegramUserConverter.fromUser(mockUser).setActive(true);
+        TelegramUser actualUser = telegramUserRepository.findById(mockUserId).get();
+        TelegramUser expectedUser = telegramUserConverter.fromUser(mockUser).setActive(true);
         assertUser(actualUser).isEqualTo(expectedUser);
     }
 
     @Test
     void whenUserIssuesStopCommand_MarkedAsInactive() {
         when(message.text()).thenReturn("/stop");
-        telegramUserRepository.save(TelegramUserConverter.fromUser(mockUser));
+        telegramUserRepository.save(telegramUserConverter.fromUser(mockUser));
 
         updateProcessor.process(update);
 
-        TelegramUser actualUser = telegramUserRepository.findById(stubUserId).get();
-        TelegramUser expectedUser = TelegramUserConverter.fromUser(mockUser).setActive(false);
+        TelegramUser actualUser = telegramUserRepository.findById(mockUserId).get();
+        TelegramUser expectedUser = telegramUserConverter.fromUser(mockUser).setActive(false);
         assertUser(actualUser).isEqualTo(expectedUser);
     }
 

@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.Clock;
+
 @Slf4j
 @Configuration
 public class Config {
@@ -16,5 +18,10 @@ public class Config {
             builder.debug();
         }
         return builder.build();
+    }
+
+    @Bean
+    public Clock systemUtcClock() {
+        return Clock.systemUTC();
     }
 }

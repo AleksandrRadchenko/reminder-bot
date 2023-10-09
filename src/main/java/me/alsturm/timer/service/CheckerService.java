@@ -29,9 +29,7 @@ public class CheckerService {
 
     private int process(List<Update> updates) {
         log.trace("Received updates: {}", updates);
-        updates.stream()
-                .filter(update -> update.message() != null) // need only updates with user input
-                .forEach(updateProcessor::process);
+        updates.forEach(updateProcessor::process);
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 }
