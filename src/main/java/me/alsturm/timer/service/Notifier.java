@@ -1,13 +1,10 @@
 package me.alsturm.timer.service;
 
 import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.request.ForceReply;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.model.request.ParseMode;
-import com.pengrad.telegrambot.request.EditMessageReplyMarkup;
-import com.pengrad.telegrambot.request.EditMessageText;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.ZoneId;
 
-import static me.alsturm.timer.model.SettingsCommand.DEFAULT_DELAY;
-import static me.alsturm.timer.model.SettingsCommand.DEFAULT_DELAY_REQUEST;
-import static me.alsturm.timer.model.SettingsCommand.DEFAULT_MESSAGE;
-import static me.alsturm.timer.model.SettingsCommand.DEFAULT_MESSAGE_REQUEST;
+import static me.alsturm.timer.model.SettingsCommand.*;
 
 @SuppressWarnings("unused")
 @Slf4j
@@ -64,6 +58,7 @@ public class Notifier {
         send(user, composer.composeStart());
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public SendResponse queryForSettings(TelegramUser user) {
         var replyKeyboardMarkup = new InlineKeyboardMarkup(
                 new InlineKeyboardButton("Фраза по умолчанию").callbackData(DEFAULT_MESSAGE.text),
@@ -90,6 +85,6 @@ public class Notifier {
         final SendMessage sendMessageRequest = new SendMessage(user.getId(), text).parseMode(ParseMode.Markdown);
         SendResponse response = bot.execute(sendMessageRequest);
         log.info("Message sent. UserId={}", user.getId());
-        log.debug("Response: {}", response);
+        log.trace("Response: {}", response);
     }
 }
