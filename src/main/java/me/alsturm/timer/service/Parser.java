@@ -16,12 +16,19 @@ import java.util.regex.Pattern;
 @Slf4j
 public class Parser {
 
+    public static final Pattern PATTERN_DURATION = Pattern.compile("(\\d+)([HЧ]?)",
+        Pattern.CASE_INSENSITIVE & Pattern.UNICODE_CASE);
+    public static final Pattern PATTERN_DELAYED_MESSAGE = Pattern.compile("/([a-zA-Zа-яА-Я]+)" // 1 group: command
+        + "(?:[\\t ]+" + PATTERN_DURATION + ")?" // 2,3 group: duration
+        + "(?:[\\t ]+([\\s\\S]+))?"  // 4 group: message
+        + "$",
+        Pattern.CASE_INSENSITIVE & Pattern.UNICODE_CASE); // EOL
+
     /**
      * Example: 80 -> 80m, 4h -> 240m
      */
     public Optional<Duration> parseForDuration(String text) {
-        Pattern pattern = Pattern.compile("(\\d+)([HhЧч]?)");
-        Matcher matcher = pattern.matcher(text);
+        Matcher matcher = PATTERN_DURATION.matcher(text);
         if (matcher.find()) {
             String durationString = matcher.group(1);
             String unit = matcher.group(2);
@@ -42,15 +49,13 @@ public class Parser {
      * Example: /timer 4 Wake up -> TimerCommand(4, "Wake up")
      */
     public Optional<DelayedMessage> parseForDelayedMessage(String text, UserSettings userSettings) {
-        Pattern pattern = Pattern.compile("/([a-zA-Zа-яА-Я]+)(?:[\\t ]+(\\d*))?(?:[\\t ]+([\\s\\S]+))?$");
-        Matcher matcher = pattern.matcher(text);
+        Matcher matcher = PATTERN_DELAYED_MESSAGE.matcher(text);
         if (matcher.find()) {
-            Duration delay = matcher.group(2) != null
-                ? Duration.ofMinutes(Long.parseLong(matcher.group(2)))
-                : userSettings.getDelay();
-            String note = matcher.group(3) != null
-                ? matcher.group(3)
-                : userSettings.getMessage();
+            Duration delay = Optional.ofNullable(matcher.group(2))
+                .flatMap(this::parseForDuration)
+                .orElse(userSettings.getDelay());
+            String note = Optional.ofNullable(matcher.group(4))
+                .orElse(userSettings.getMessage());
             return Optional.of(new DelayedMessage(delay, note));
         } else {
             return Optional.empty();
