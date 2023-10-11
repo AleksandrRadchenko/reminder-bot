@@ -23,14 +23,18 @@ public class UserSettingsService {
         this.userSettingsRepository = userSettingsRepository;
     }
 
-    public UserSettings findByIdOrCreateNew(Long id) {
+    public UserSettings findByIdOrDefault(Long id) {
         Optional<UserSettings> maybeUserSettings = userSettingsRepository.findById(id);
         if (maybeUserSettings.isPresent()) {
             log.debug("Found userSettings by id={}", id);
             return maybeUserSettings.get();
         } else {
             log.debug("Created new userSettings for user id={}", id);
-            return UserSettings.builder().telegramUserId(id).build();
+            return UserSettings.builder()
+                .telegramUserId(id)
+                .message("Time to move")
+                .delay(properties.getDefaultDelay())
+                .build();
         }
     }
 
@@ -48,23 +52,9 @@ public class UserSettingsService {
 
     @SuppressWarnings("UnusedReturnValue")
     private UserSettings updateSettings(TelegramUser user, Consumer<UserSettings> updateAction) {
-        UserSettings userSettings = this.findByIdOrCreateNew(user.getId());
+        UserSettings userSettings = this.findByIdOrDefault(user.getId());
         updateAction.accept(userSettings);
         userSettings = userSettingsRepository.save(userSettings);
         return userSettings;
-    }
-
-    public String getDefaultMessage(TelegramUser user) {
-        return userSettingsRepository
-                .findById(user.getId())
-                .map(UserSettings::getMessage)
-                .orElse("Пора размяться");
-    }
-
-    public Duration getDefaultDelay(TelegramUser user) {
-        return userSettingsRepository
-                .findById(user.getId())
-                .map(UserSettings::getDelay)
-                .orElse(properties.getDefaultDelay());
     }
 }

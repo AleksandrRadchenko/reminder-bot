@@ -1,6 +1,6 @@
 package me.alsturm.timer.service;
 
-import me.alsturm.timer.entity.TelegramUser;
+import me.alsturm.timer.entity.UserSettings;
 import me.alsturm.timer.model.DelayedMessage;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -9,7 +9,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
@@ -18,24 +17,24 @@ import java.util.stream.Stream;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.lenient;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 @ExtendWith(MockitoExtension.class)
-class UpdateProcessorTest {
-    @Mock
-    UserSettingsService userSettingsService;
+class ParserTest {
+    public static final String DEFAULT_PHRASE = "Time to move";
     @InjectMocks
-    UpdateProcessor updateProcessor;
+    Parser parser;
 
     @ParameterizedTest
     @ArgumentsSource(TimerCommandArgumentProvider.class)
     void parseTimerCommand(String command, Optional<DelayedMessage> parsedCommand) {
-        TelegramUser user = new TelegramUser().setId(1L);
-        lenient().when(userSettingsService.getDefaultDelay(user)).thenReturn(Duration.ofMinutes(30));
-        lenient().when(userSettingsService.getDefaultMessage(user)).thenReturn("Пора размяться");
+        UserSettings mockUserSettings = UserSettings.builder()
+            .telegramUserId(1L)
+            .message(DEFAULT_PHRASE)
+            .delay(Duration.ofMinutes(30))
+            .build();
 
-        Optional<DelayedMessage> actualParsedCommand = updateProcessor.parseForDelayedMessage(user, command);
+        Optional<DelayedMessage> actualParsedCommand = parser.parseForDelayedMessage(command, mockUserSettings);
 
         assertThat(actualParsedCommand).isEqualTo(parsedCommand);
     }
@@ -53,10 +52,10 @@ class UpdateProcessorTest {
                     Arguments.of("/timer 5 Hello\nmy dear", Optional.of(new DelayedMessage(d5m, "Hello\nmy dear"))),
                     Arguments.of("/timer 5 2", Optional.of(new DelayedMessage(d5m, "2"))),
                     Arguments.of("/timer hello 2", Optional.of(new DelayedMessage(d30m, "hello 2"))),
-                    Arguments.of("/timer", Optional.of(new DelayedMessage(d30m, "Пора размяться"))),
+                    Arguments.of("/timer", Optional.of(new DelayedMessage(d30m, DEFAULT_PHRASE))),
                     Arguments.of("/timer Hello", Optional.of(new DelayedMessage(d30m, "Hello"))),
-                    Arguments.of("/timer 5", Optional.of(new DelayedMessage(d5m, "Пора размяться"))),
-                    Arguments.of("/t 5", Optional.of(new DelayedMessage(d5m, "Пора размяться")))
+                    Arguments.of("/timer 5", Optional.of(new DelayedMessage(d5m, DEFAULT_PHRASE))),
+                    Arguments.of("/t 5", Optional.of(new DelayedMessage(d5m, DEFAULT_PHRASE)))
             );
         }
     }

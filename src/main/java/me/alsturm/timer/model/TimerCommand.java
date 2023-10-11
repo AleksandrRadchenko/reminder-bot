@@ -26,6 +26,7 @@ public enum TimerCommand {
     }
 
     private boolean aliasIsBeginningOf(String text) {
-        return this.aliases.stream().anyMatch(alias -> text.toLowerCase().startsWith("/" + alias.toLowerCase()));
+        return text != null
+            && this.aliases.stream().anyMatch(alias -> text.toLowerCase().startsWith("/" + alias.toLowerCase()));
     }
 }
