@@ -17,6 +17,9 @@ public enum TimerCommand {
     public final List<String> aliases;
 
     public static TimerCommand from(String text) {
+        if (text == null) {
+            return UNKNOWN;
+        }
         for (TimerCommand command : TimerCommand.values()) {
             if (command.aliasIsBeginningOf(text)) {
                 return command;
@@ -26,7 +29,6 @@ public enum TimerCommand {
     }
 
     private boolean aliasIsBeginningOf(String text) {
-        return text != null
-            && this.aliases.stream().anyMatch(alias -> text.toLowerCase().startsWith("/" + alias.toLowerCase()));
+        return this.aliases.stream().anyMatch(alias -> text.toLowerCase().startsWith(COMMAND_PREFIX + alias.toLowerCase()));
     }
 }
