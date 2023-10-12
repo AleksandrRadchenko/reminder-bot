@@ -10,6 +10,8 @@ public enum TimerCommand {
     STOP("stop"),
     UNKNOWN("Unknown command");
 
+    public static final String COMMAND_PREFIX = "/";
+
     TimerCommand(String... aliases) {
         this.aliases = List.of(aliases);
     }
@@ -20,12 +22,16 @@ public enum TimerCommand {
         if (text == null) {
             return UNKNOWN;
         }
-        for (TimerCommand command : TimerCommand.values()) {
-            if (command.aliasIsBeginningOf(text)) {
-                return command;
+        if (text.startsWith(COMMAND_PREFIX)) {
+            for (TimerCommand command : TimerCommand.values()) {
+                if (command.aliasIsBeginningOf(text)) {
+                    return command;
+                }
             }
+            return UNKNOWN;
+        } else {
+            return TIMER;
         }
-        return UNKNOWN;
     }
 
     private boolean aliasIsBeginningOf(String text) {

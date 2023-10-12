@@ -126,7 +126,8 @@ public class UpdateProcessor {
      */
     private void setTimer(TelegramUser user, String text) {
         UserSettings userSettings = userSettingsService.findByIdOrDefault(user.getId());
-        Optional<DelayedMessage> mayBeDelayedMessage = parser.parseForDelayedMessage(text, userSettings);
+        String payload = parser.parseForPayload(text);
+        Optional<DelayedMessage> mayBeDelayedMessage = parser.parseForDelayedMessage(payload, userSettings);
         if (mayBeDelayedMessage.isPresent()) {
             notifier.notifyWithDelay(user, mayBeDelayedMessage.get());
         } else {
