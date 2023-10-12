@@ -12,17 +12,41 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static me.alsturm.timer.model.TimerCommand.COMMAND_PREFIX;
+
 @Service
 @Slf4j
 public class Parser {
+    public static final Pattern PATTERN_COMMAND = Pattern.compile(COMMAND_PREFIX + "[a-zA-Zа-яА-Я]+\\s*");
+    public static final Pattern PATTERN_PAYLOAD = Pattern.compile(PATTERN_COMMAND + "(.*)"); // 1 group
+    public static final Pattern PATTERN_DURATION = Pattern.compile("(\\d+)([HhЧч]?)\\s*"); //1,2 group
+    public static final Pattern PATTERN_DELAYED_MESSAGE = Pattern.compile(
+            "(?:" + PATTERN_DURATION + ")?" // 1,2 group
+            + "([\\S\\s]*)"  // 3 group: message
+            + "$"); // EOL
 
-    public static final Pattern PATTERN_DURATION = Pattern.compile("(\\d+)([HЧ]?)",
-        Pattern.CASE_INSENSITIVE & Pattern.UNICODE_CASE);
-    public static final Pattern PATTERN_DELAYED_MESSAGE = Pattern.compile("/([a-zA-Zа-яА-Я]+)" // 1 group: command
-        + "(?:[\\t ]+" + PATTERN_DURATION + ")?" // 2,3 group: duration
-        + "(?:[\\t ]+([\\s\\S]+))?"  // 4 group: message
-        + "$",
-        Pattern.CASE_INSENSITIVE & Pattern.UNICODE_CASE); // EOL
+    /**
+     * Examples:
+     * <ul>
+     * <li> /t 12 Message -> 12 Message</li>
+     * <li>Go 12 -> Go 12</li>
+     * </ul>
+     *
+     * @param text message to parse
+     * @return payload of the message, without command
+     */
+    public String parseForPayload(String text) {
+        String payload = "";
+        if (text.startsWith(COMMAND_PREFIX)) {
+            Matcher matcher = PATTERN_PAYLOAD.matcher(text);
+            if (matcher.find()) {
+                payload = matcher.group(1);
+            }
+        } else {
+            payload = text;
+        }
+        return payload;
+    }
 
     /**
      * Example: 80 -> 80m, 4h -> 240m
@@ -46,15 +70,17 @@ public class Parser {
     }
 
     /**
-     * Example: /timer 4 Wake up -> TimerCommand(4, "Wake up")
+     * Example: 4 Wake up -> TimerCommand(4, "Wake up")
      */
-    public Optional<DelayedMessage> parseForDelayedMessage(String text, UserSettings userSettings) {
-        Matcher matcher = PATTERN_DELAYED_MESSAGE.matcher(text);
+    public Optional<DelayedMessage> parseForDelayedMessage(String payload, UserSettings userSettings) {
+        Matcher matcher = PATTERN_DELAYED_MESSAGE.matcher(payload);
         if (matcher.find()) {
-            Duration delay = Optional.ofNullable(matcher.group(2))
+            Duration delay = Optional.ofNullable(matcher.group(1))
                 .flatMap(this::parseForDuration)
                 .orElse(userSettings.getDelay());
-            String note = Optional.ofNullable(matcher.group(4))
+            String note = Optional.ofNullable(matcher.group(3))
+                .map(String::trim)
+                .filter(StringUtils::hasText)
                 .orElse(userSettings.getMessage());
             return Optional.of(new DelayedMessage(delay, note));
         } else {
