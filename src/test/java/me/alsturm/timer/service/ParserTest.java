@@ -80,6 +80,12 @@ class ParserTest {
                     Arguments.of("42H", Optional.of(Duration.ofHours(42))),
                     Arguments.of("42ч", Optional.of(Duration.ofHours(42))),
                     Arguments.of("42Ч", Optional.of(Duration.ofHours(42))),
+                    Arguments.of("42h30m", Optional.of(Duration.ofHours(42).plusMinutes(30))),
+                    Arguments.of("42ч30м", Optional.of(Duration.ofHours(42).plusMinutes(30))),
+                    Arguments.of("1h120м", Optional.of(Duration.ofHours(3))),
+                    Arguments.of("42h0м", Optional.of(Duration.ofHours(42))),
+                    Arguments.of("0h42м", Optional.of(Duration.ofMinutes(42))),
+                    Arguments.of("asdasd42м", Optional.empty()),
                     Arguments.of("42a", Optional.of(Duration.ofMinutes(42)))
             );
         }
