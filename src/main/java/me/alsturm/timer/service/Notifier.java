@@ -9,6 +9,7 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.extern.slf4j.Slf4j;
 import me.alsturm.timer.entity.TelegramUser;
+import me.alsturm.timer.entity.UserSettings;
 import me.alsturm.timer.model.DelayedMessage;
 import me.alsturm.timer.model.TimerCommand;
 import org.springframework.scheduling.TaskScheduler;
@@ -59,12 +60,15 @@ public class Notifier {
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    public SendResponse queryForSettings(TelegramUser user) {
+    public SendResponse queryForSettings(TelegramUser user, UserSettings userSettings) {
         var replyKeyboardMarkup = new InlineKeyboardMarkup(
-                new InlineKeyboardButton("Фраза по умолчанию").callbackData(DEFAULT_MESSAGE.text),
-                new InlineKeyboardButton("Задержка по умолчанию").callbackData(DEFAULT_DELAY.text)
+                new InlineKeyboardButton("Задать сообщение").callbackData(DEFAULT_MESSAGE.text),
+                new InlineKeyboardButton("Задать задержку").callbackData(DEFAULT_DELAY.text)
         );
-        SendMessage sendMessageRequest = new SendMessage(user.getId(), "Настройки").replyMarkup(replyKeyboardMarkup);
+        SendMessage sendMessageRequest =
+            new SendMessage(user.getId(), composer.composeSettings(userSettings))
+                .parseMode(ParseMode.Markdown)
+                .replyMarkup(replyKeyboardMarkup);
 
         return bot.execute(sendMessageRequest);
     }

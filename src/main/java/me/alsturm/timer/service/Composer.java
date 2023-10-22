@@ -2,7 +2,10 @@ package me.alsturm.timer.service;
 
 import lombok.extern.slf4j.Slf4j;
 import me.alsturm.timer.config.TimerProperties;
+import me.alsturm.timer.entity.UserSettings;
 import org.springframework.stereotype.Service;
+
+import java.time.Duration;
 
 import static me.alsturm.timer.model.TimerCommand.SET;
 
@@ -33,5 +36,21 @@ public class Composer {
 
     public String composeStart() {
         return "Не забуду напомнить! Напомню, чтобы не забыть! Помощь: /help";
+    }
+
+    public String composeSettings(UserSettings userSettings) {
+        Duration delay = userSettings.getDelay();
+        return "Настройки:" + newline
+            + " • сообщение по умолчанию: `" + userSettings.getMessage() + "`" + newline
+            + " • задержка по умолчанию: `" + formatDuration(delay) + "`";
+    }
+
+    private String formatDuration(Duration duration) {
+        long m = duration.toMinutes();
+        if (m < 60) {
+            return String.format("%dм", m);
+        } else {
+            return String.format("%dч%02dм", m / 60, (m % 60));
+        }
     }
 }

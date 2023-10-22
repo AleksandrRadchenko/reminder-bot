@@ -136,7 +136,8 @@ public class UpdateProcessor {
     }
 
     private void settings(TelegramUser user) {
-        notifier.queryForSettings(user);
+        UserSettings userSettings = userSettingsService.findByIdOrDefault(user.getId());
+        notifier.queryForSettings(user, userSettings);
     }
 
     @SuppressWarnings("unused") // for future use
