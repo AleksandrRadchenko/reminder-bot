@@ -29,4 +29,11 @@ public class ReminderProperties {
      * Telegram id to send debug info to. Typically, admin of current bot installation.
      */
     private Long supportContactId;
+    /**
+     * How long to accumulate updates. Accumulator tries to catch
+     * 'forwarded'&'comment' message pair. Should be non-zero to catch
+     * the pair, but less than a time user is able to send two independent
+     * messages consecutively.
+     */
+    private Duration accumulatingDuration = Duration.ofMillis(200);
 }

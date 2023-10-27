@@ -54,7 +54,7 @@ public class Notifier {
     }
 
     public void notifyAdmin(String text) {
-        log.warn("Notifying admin");
+        log.warn("Notifying admin: {}", text);
         TelegramUser admin = new TelegramUser().setId(reminderProperties.getSupportContactId());
         sendPlainText(admin, text);
     }

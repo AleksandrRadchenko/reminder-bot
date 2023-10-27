@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Duration;
+import java.util.List;
 
 import static me.alsturm.reminder.model.ReminderCommand.COMMAND_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,7 +33,7 @@ import static org.mockito.Mockito.when;
 @Slf4j
 class UpdateProcessorIT extends IntegrationTestBase {
     @Autowired
-    UpdateProcessor updateProcessor;
+    UpdateProcessorImpl updateProcessor;
     @Autowired
     TelegramUserRepository telegramUserRepository;
     @Autowired
@@ -70,7 +71,7 @@ class UpdateProcessorIT extends IntegrationTestBase {
     void whenUserIssuesStartCommand_SaveUser() {
         when(message.text()).thenReturn(COMMAND_PREFIX + ReminderCommand.START.aliases.get(0));
 
-        updateProcessor.process(update);
+        updateProcessor.process(List.of(update));
 
         TelegramUser actualUser = telegramUserRepository.findById(stubUserId).get();
         TelegramUser expectedUser = telegramUserConverter.fromUser(stubUser).setActive(true);
@@ -82,7 +83,7 @@ class UpdateProcessorIT extends IntegrationTestBase {
         when(message.text()).thenReturn(COMMAND_PREFIX + ReminderCommand.STOP.aliases.get(0));
         telegramUserRepository.save(telegramUserConverter.fromUser(stubUser));
 
-        updateProcessor.process(update);
+        updateProcessor.process(List.of(update));
 
         TelegramUser actualUser = telegramUserRepository.findById(stubUserId).get();
         TelegramUser expectedUser = telegramUserConverter.fromUser(stubUser).setActive(false);
@@ -94,7 +95,7 @@ class UpdateProcessorIT extends IntegrationTestBase {
         when(message.text()).thenReturn(COMMAND_PREFIX + ReminderCommand.SET.aliases.get(0));
         userSettingsRepository.save(stubSettings);
 
-        updateProcessor.process(update);
+        updateProcessor.process(List.of(update));
 
         verify(telegramBot).execute(sendMessageArgumentCaptor.capture());
         SendMessage actualSendMessage = sendMessageArgumentCaptor.getValue();
