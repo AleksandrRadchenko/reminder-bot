@@ -15,25 +15,29 @@ import java.util.List;
 public class CheckerService {
     private final TelegramBot bot;
     private final UpdateProcessor updateProcessor;
-    private final TelegramExceptionHandler telegramExceptionHandler;
+    private final ExceptionHandler exceptionHandler;
 
     public CheckerService(TelegramBot bot,
                           UpdateProcessor updateProcessor,
-                          TelegramExceptionHandler telegramExceptionHandler) {
+                          ExceptionHandler exceptionHandler) {
         this.bot = bot;
         this.updateProcessor = updateProcessor;
-        this.telegramExceptionHandler = telegramExceptionHandler;
+        this.exceptionHandler = exceptionHandler;
     }
 
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
-        bot.setUpdatesListener(this::process, telegramExceptionHandler::handle);
+        bot.setUpdatesListener(this::process, exceptionHandler::handleTelegramException);
     }
 
     private int process(List<Update> updates) {
-        log.trace("Received updates: {}", updates);
-        telegramExceptionHandler.printAndResetPreviousErrorIfExists();
-        updates.forEach(updateProcessor::process);
+        try {
+            log.trace("Received updates: {}", updates);
+            exceptionHandler.printAndResetPreviousErrorIfExists();
+            updates.forEach(updateProcessor::process);
+        } catch (Exception e) {
+            exceptionHandler.handleGlobalException(e);
+        }
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 }

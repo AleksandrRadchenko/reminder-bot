@@ -25,4 +25,8 @@ public class TimerProperties {
      * Default delay for /timer command without arguments. In minutes.
      */
     private Duration defaultDelay = Duration.of(30, ChronoUnit.MINUTES);
+    /**
+     * Telegram id to send debug info to. Typically, admin of current bot installation.
+     */
+    private Long supportContactId;
 }

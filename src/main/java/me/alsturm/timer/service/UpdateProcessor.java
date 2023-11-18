@@ -52,6 +52,7 @@ public class UpdateProcessor {
             processCommand(update);
         } else {
             log.warn("Won't handle update: {}", update);
+            notifier.notifyAdmin("Won't handle update: " + update);
         }
     }
 
@@ -91,7 +92,10 @@ public class UpdateProcessor {
             case HELP -> help(user);
             case TIMER -> setTimer(user, text);
             case SET -> settings(user);
-            default -> notifier.notifyUnknownCommand(user, text);
+            case UNKNOWN -> {
+                notifier.notifyUnknownCommand(user, text);
+                notifier.notifyAdmin("Unknown command. Update: " + update);
+            }
         }
     }
 

@@ -8,6 +8,7 @@ import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.extern.slf4j.Slf4j;
+import me.alsturm.timer.config.TimerProperties;
 import me.alsturm.timer.entity.TelegramUser;
 import me.alsturm.timer.entity.UserSettings;
 import me.alsturm.timer.model.DelayedMessage;
@@ -27,11 +28,13 @@ public class Notifier {
     private final TelegramBot bot;
     private final Composer composer;
     private final TaskScheduler taskScheduler;
+    private final TimerProperties timerProperties;
 
-    public Notifier(TelegramBot bot, Composer composer, TaskScheduler taskScheduler) {
+    public Notifier(TelegramBot bot, Composer composer, TaskScheduler taskScheduler, TimerProperties timerProperties) {
         this.bot = bot;
         this.composer = composer;
         this.taskScheduler = taskScheduler;
+        this.timerProperties = timerProperties;
     }
 
     public void notifyWithDelay(TelegramUser user, DelayedMessage delayedMessage) {
@@ -50,9 +53,10 @@ public class Notifier {
         send(user, TimerCommand.UNKNOWN.aliases.get(0));
     }
 
-    public void notifyError(TelegramUser user, String details) {
-        String text = "Произошла техническая ошибка. " + details;
-        send(user, text);
+    public void notifyAdmin(String text) {
+        log.warn("Notifying admin");
+        TelegramUser admin = new TelegramUser().setId(timerProperties.getSupportContactId());
+        sendPlainText(admin, text);
     }
 
     public void notifyStart(TelegramUser user) {
@@ -86,7 +90,18 @@ public class Notifier {
     }
 
     private void send(TelegramUser user, String text) {
-        final SendMessage sendMessageRequest = new SendMessage(user.getId(), text).parseMode(ParseMode.Markdown);
+        sendInternal(user, text, ParseMode.Markdown);
+    }
+
+    private void sendPlainText(TelegramUser user, String text) {
+        sendInternal(user, text, null);
+    }
+
+    private void sendInternal(TelegramUser user, String text, ParseMode parseMode) {
+        SendMessage sendMessageRequest = new SendMessage(user.getId(), text);
+        if (parseMode != null) {
+            sendMessageRequest.parseMode(parseMode);
+        }
         SendResponse response = bot.execute(sendMessageRequest);
         log.info("Message sent. UserId={}", user.getId());
         log.trace("Response: {}", response);
