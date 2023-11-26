@@ -29,7 +29,7 @@ public class UserSettingsService {
             log.debug("Found userSettings by id={}", id);
             return maybeUserSettings.get();
         } else {
-            log.debug("Created new userSettings for user id={}", id);
+            log.debug("Settings not found for user id={}, use defaults", id);
             return UserSettings.builder()
                 .telegramUserId(id)
                 .message("Time to move")
