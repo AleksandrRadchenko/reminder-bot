@@ -1,0 +1,20 @@
+version: '3.1'
+
+services:
+  reminder-db:
+    image: postgres:13.2
+    ports:
+      - "12013:5432"
+    container_name: reminder-db
+    environment:
+      - POSTGRES_DB=reminder
+      - POSTGRES_USER=reminder
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgresql:/var/lib/postgresql
+      - postgresql_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgresql:
+  postgresql_data:

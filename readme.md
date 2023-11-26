@@ -1,12 +1,12 @@
 ### About
-Telegram bot @TimerReminderBot (http://t.me/TimerReminderBot). 
+Stupid simple task manager as Telegram bot @TimerReminderBot (http://t.me/TimerReminderBot). 
 
 ### Prerequisites
 JDK 17
 
 ### How to run
 Specify Telegram bot token via `BOT_TOKEN` environment variable.
-For example: `java -DBOT_TOKEN=<your_token> -jar Timer-1.0-SNAPSHOT.jar`
+For example: `java -DBOT_TOKEN=<your_token> -jar Reminder-1.0-SNAPSHOT.jar`
 
 ### Database
 Set password: `$env:POSTGRES_PASSWORD='...'`
@@ -23,7 +23,7 @@ Set liquibase properties in maven settings file (ex: %MAVEN_HOME%\.m2\settings.x
             <activeByDefault>true</activeByDefault>
         </activation>
         <properties>
-            <liquibase.url>jdbc:postgresql://localhost:12013/timer</liquibase.url>
+            <liquibase.url>jdbc:postgresql://localhost:12013/reminder</liquibase.url>
             <liquibase.username>...</liquibase.username>
             <liquibase.password>...</liquibase.password>
         </properties>
@@ -31,7 +31,7 @@ Set liquibase properties in maven settings file (ex: %MAVEN_HOME%\.m2\settings.x
     <profile>
         <id>serv</id>
         <properties>
-            <liquibase.url>jdbc:postgresql://${server_path}:12013/timer</liquibase.url>
+            <liquibase.url>jdbc:postgresql://${server_path}:12013/reminder</liquibase.url>
             <liquibase.username>...</liquibase.username>
             <liquibase.password>...</liquibase.password>
         </properties>
