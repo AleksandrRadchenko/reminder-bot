@@ -6,7 +6,7 @@ JDK 17
 
 ### How to run
 Specify Telegram bot token via `BOT_TOKEN` environment variable.
-For example: `java -DBOT_TOKEN=<your_token> -jar Reminder-1.0-SNAPSHOT.jar`
+For example: `java -DBOT_TOKEN=<your_token> -jar reminder-1.0-SNAPSHOT.jar`
 
 ### Database
 Set password: `$env:POSTGRES_PASSWORD='...'`
