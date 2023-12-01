@@ -31,9 +31,9 @@ public class ReminderProperties {
     private Long supportContactId;
     /**
      * How long to accumulate updates. Accumulator tries to catch
-     * 'forwarded'&'comment' message pair. Should be non-zero to catch
+     * 'forwarded'&'comment' message pair. Duration should be non-zero to catch
      * the pair, but less than a time user is able to send two independent
      * messages consecutively.
      */
-    private Duration accumulatingDuration = Duration.ofMillis(200);
+    private Duration accumulatingDuration = Duration.ofMillis(400);
 }
