@@ -6,20 +6,16 @@ import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.request.SendMessage;
 import lombok.extern.slf4j.Slf4j;
 import me.alsturm.reminder.IntegrationTestBase;
-import me.alsturm.reminder.entity.UserSettings;
-import me.alsturm.reminder.mapper.TelegramUserConverter;
 import me.alsturm.reminder.entity.TelegramUser;
+import me.alsturm.reminder.entity.UserSettings;
 import me.alsturm.reminder.mocks.MockUser;
 import me.alsturm.reminder.model.ReminderCommand;
-import me.alsturm.reminder.repository.TelegramUserRepository;
-import me.alsturm.reminder.repository.UserSettingsRepository;
 import org.assertj.core.api.AbstractAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Duration;
 import java.util.List;
@@ -32,15 +28,6 @@ import static org.mockito.Mockito.when;
 @SuppressWarnings("OptionalGetWithoutIsPresent")
 @Slf4j
 class UpdateProcessorIT extends IntegrationTestBase {
-    @Autowired
-    UpdateProcessorImpl updateProcessor;
-    @Autowired
-    TelegramUserRepository telegramUserRepository;
-    @Autowired
-    UserSettingsRepository userSettingsRepository;
-    @Autowired
-    TelegramUserConverter telegramUserConverter;
-
     @Mock
     Update update;
     @Mock
