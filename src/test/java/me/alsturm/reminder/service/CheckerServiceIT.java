@@ -8,7 +8,6 @@ import me.alsturm.reminder.mocks.MockUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 
@@ -17,14 +16,10 @@ import java.util.List;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@TestPropertySource(properties = "timer.accumulating-duration=40ms")
+@TestPropertySource(properties = "reminder.accumulating-duration=40ms")
 class CheckerServiceIT extends IntegrationTestBase {
     @MockBean
     UpdateProcessorImpl updateProcessor;
-    @Autowired
-    CheckerService checkerService;
-    @Autowired
-    GroupingUpdatesAccumulator updatesAccumulator;
 
     @Mock Update update1;
     @Mock Update update2;
@@ -63,10 +58,12 @@ class CheckerServiceIT extends IntegrationTestBase {
         updatesAccumulator.accumulateUpdates(List.of(update4));
         Thread.sleep(30);
         updatesAccumulator.accumulateUpdates(List.of(update5));
-        //
+
+        //assert
         verify(updateProcessor).process(List.of(update1, update2));
         verify(updateProcessor).process(List.of(update3));
         verify(updateProcessor).process(List.of(update4));
+        Thread.sleep(50); //wait for scheduler to process update5
         verify(updateProcessor).process(List.of(update5));
     }
 }

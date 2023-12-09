@@ -15,6 +15,7 @@ import me.alsturm.reminder.model.DelayedMessage;
 import me.alsturm.reminder.model.SettingsCommand;
 import me.alsturm.reminder.model.ReminderCommand;
 import org.apache.commons.collections4.CollectionUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -45,7 +46,8 @@ public class UpdateProcessorImpl implements UpdateProcessor {
         this.userSettingsService = userSettingsService;
     }
 
-    public void process(List<Update> updatesFromOneSender) {
+    public void process(@NotNull List<Update> updatesFromOneSender) {
+        log.debug("Received {} updates", updatesFromOneSender.size());
         if (CollectionUtils.isEmpty(updatesFromOneSender)) {
             notifier.notifyAdmin("Received empty update list");
         } else {
