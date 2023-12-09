@@ -41,10 +41,10 @@ public class GroupingUpdatesAccumulator {
     }
 
     public int accumulateUpdates(List<Update> updates) {
+        cachedUpdates.addAll(updates);
         if (!accumulatingInProcess.get()) {
             startAccumulating();
         }
-        cachedUpdates.addAll(updates);
         // tech debt: we loose update if app crashes while processing accumulated updates
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
