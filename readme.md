@@ -2,11 +2,11 @@
 Stupid simple task manager as Telegram bot @TimerReminderBot (http://t.me/TimerReminderBot). 
 
 ### Prerequisites
-JDK 17
+JDK 21
 
 ### How to run
 Specify Telegram bot token via `BOT_TOKEN` environment variable.
-For example: `java -DBOT_TOKEN=<your_token> -jar reminder-1.0-SNAPSHOT.jar`
+For example: `java -DBOT_TOKEN=<your_token> -DPOSTGRES_PASSWORD=<db pass> -jar reminder-1.0-SNAPSHOT.jar`
 
 ### Database
 Set password: `$env:POSTGRES_PASSWORD='...'`
