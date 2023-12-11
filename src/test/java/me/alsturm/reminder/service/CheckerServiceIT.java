@@ -56,7 +56,7 @@ class CheckerServiceIT extends IntegrationTestBase {
         updatesAccumulator.accumulateUpdates(List.of(update3));
         Thread.sleep(10);
         updatesAccumulator.accumulateUpdates(List.of(update4));
-        Thread.sleep(30);
+        Thread.sleep(50);
         updatesAccumulator.accumulateUpdates(List.of(update5));
 
         //assert

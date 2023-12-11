@@ -1,6 +1,6 @@
 package me.alsturm.reminder.entity;
 
-import com.vladmihalcea.hibernate.type.interval.PostgreSQLIntervalType;
+import io.hypersistence.utils.hibernate.type.interval.PostgreSQLIntervalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,11 +8,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import org.hibernate.annotations.Type;
+
 import java.time.Duration;
 
 @Entity
@@ -23,11 +24,11 @@ import java.time.Duration;
 @Setter
 @Accessors(chain = true)
 @ToString
-@TypeDef(typeClass = PostgreSQLIntervalType.class, defaultForType = Duration.class)
 public class UserSettings {
     @Id
     private Long telegramUserId;
     private String message;
+    @Type(PostgreSQLIntervalType.class)
     @Column(columnDefinition = "interval")
     private Duration delay;
 }
