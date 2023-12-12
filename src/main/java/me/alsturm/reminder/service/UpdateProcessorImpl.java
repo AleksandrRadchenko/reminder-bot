@@ -52,7 +52,7 @@ public class UpdateProcessorImpl implements UpdateProcessor {
             notifier.notifyAdmin("Received empty update list");
         } else {
             if (updatesFromOneSender.get(0).message() == null) {
-                updatesFromOneSender.forEach(update -> notifier.notifyAdmin("Won't handle tech update: " + update));
+                updatesFromOneSender.forEach(update -> notifier.notifyAdmin("Won't handle tech update.", update));
             } else {
                 processInternal(updatesFromOneSender);
             }
@@ -72,7 +72,7 @@ public class UpdateProcessorImpl implements UpdateProcessor {
             } else if (update.message() != null) {
                 processCommand(update);
             } else {
-                notifier.notifyAdmin("Won't handle update: " + update);
+                notifier.notifyAdmin("Won't handle update.", update);
             }
         } else if (updates.size() == 2) {
             processForwardedMessage(updates);
@@ -120,7 +120,7 @@ public class UpdateProcessorImpl implements UpdateProcessor {
             case SET -> settings(user);
             case UNKNOWN -> {
                 notifier.notifyUnknownCommand(user, text);
-                notifier.notifyAdmin("Unknown command. Update: " + update);
+                notifier.notifyAdmin("Unknown command.", update);
             }
         }
     }

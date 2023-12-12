@@ -1,8 +1,14 @@
 package me.alsturm.reminder.service;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import me.alsturm.reminder.config.ReminderProperties;
 import me.alsturm.reminder.entity.UserSettings;
+import me.alsturm.reminder.exception.JsonException;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -51,6 +57,17 @@ public class Composer {
             return String.format("%dм", m);
         } else {
             return String.format("%dч%02dм", m / 60, (m % 60));
+        }
+    }
+
+    public String toPrettyJson(Object anyObject) {
+        ObjectMapper objectMapper = new ObjectMapper()
+            .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        try {
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(anyObject);
+        } catch (JsonProcessingException e) {
+            throw new JsonException(e);
         }
     }
 }
