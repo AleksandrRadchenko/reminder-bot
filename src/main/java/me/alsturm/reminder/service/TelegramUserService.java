@@ -5,7 +5,7 @@ import me.alsturm.reminder.entity.TelegramUser;
 import me.alsturm.reminder.repository.TelegramUserRepository;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.Optional;
 
 @SuppressWarnings({"unused"})
