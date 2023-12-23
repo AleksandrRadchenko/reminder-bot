@@ -1,6 +1,7 @@
 package me.alsturm.reminder.service;
 
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ForceReply;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
@@ -57,6 +58,17 @@ public class Notifier {
         log.warn("Notifying admin: {}", text);
         TelegramUser admin = new TelegramUser().setId(reminderProperties.getSupportContactId());
         sendPlainText(admin, text);
+    }
+
+    public void notifyAdmin(String text, Update update) {
+        log.warn("Notifying admin: {}", text);
+        TelegramUser admin = new TelegramUser().setId(reminderProperties.getSupportContactId());
+        String formattedUpdate = "```" + System.lineSeparator() + composer.toPrettyJson(update) + "```";
+        send(admin, text + " Update: " + formattedUpdate);
+    }
+
+    public void notifyAdmin(Update update) {
+        notifyAdmin("", update);
     }
 
     public void notifyStart(TelegramUser user) {

@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * NOT THREADSAFE!
+ * NOT THREAD-SAFE!
  */
 @Slf4j
 @Service
@@ -45,7 +45,7 @@ public class ExceptionHandler {
     public void handleTelegramException(TelegramException e) {
         if (e.response() != null) {
             // got bad response from telegram
-            log.error("Code={}, decr={}", e.response().errorCode(), e.response().description());
+            log.error("Code={}, description={}", e.response().errorCode(), e.response().description());
         } else {
             // probably network error
             groupSimilarErrors(e);
