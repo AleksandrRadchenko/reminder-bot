@@ -58,7 +58,7 @@ public class UpdateProcessorImpl implements UpdateProcessor {
     //TODO: replace with strategies: ProcessKeyboardButtonPressStrategy, ProcessReplyStrategy, ... see https://ru.yougile.com/team/406a0929992c/#REM-25
     public void processInternal(List<Update> updates) {
         if (updates.size() == 1) {
-            Update update = updates.get(0);
+            Update update = updates.getFirst();
             if (update.callbackQuery() != null) {
                 processKeyboardButtonPress(update);
             } else if (update.message() != null && update.message().replyToMessage() != null) {
