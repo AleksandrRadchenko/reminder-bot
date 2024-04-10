@@ -51,11 +51,7 @@ public class UpdateProcessorImpl implements UpdateProcessor {
         if (CollectionUtils.isEmpty(updatesFromOneSender)) {
             notifier.notifyAdmin("Received empty update list");
         } else {
-            if (updatesFromOneSender.get(0).message() == null) {
-                updatesFromOneSender.forEach(update -> notifier.notifyAdmin("Won't handle tech update.", update));
-            } else {
-                processInternal(updatesFromOneSender);
-            }
+            processInternal(updatesFromOneSender);
         }
     }
 
