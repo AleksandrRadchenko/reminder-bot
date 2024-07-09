@@ -52,7 +52,7 @@ public class Notifier {
 
     public void notifyUnknownCommand(TelegramUser user, String text) {
         log.warn("Unknown command: '{}' from user {}", text, user.toShortString());
-        send(user, ReminderCommand.UNKNOWN.aliases.get(0));
+        send(user, ReminderCommand.UNKNOWN.aliases.getFirst());
     }
 
     public void notifyAdmin(String text) {
