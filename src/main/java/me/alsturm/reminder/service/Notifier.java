@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 import static me.alsturm.reminder.model.SettingsCommand.*;
 
@@ -41,7 +42,7 @@ public class Notifier {
     public void notifyWithDelay(TelegramUser user, DelayedMessage delayedMessage) {
         Instant targetInstant = taskScheduler.getClock().instant().plus(delayedMessage.getDelay());
         taskScheduler.schedule(() -> send(user, delayedMessage.getMessage()), targetInstant);
-        log.info("Schedule sending for {}", targetInstant.atZone(ZoneId.systemDefault()));
+        notifyScheduleCreated(user, targetInstant);
     }
 
     public void notifyHelp(TelegramUser user) {
@@ -51,7 +52,7 @@ public class Notifier {
 
     public void notifyUnknownCommand(TelegramUser user, String text) {
         log.warn("Unknown command: '{}' from user {}", text, user.toShortString());
-        send(user, ReminderCommand.UNKNOWN.aliases.get(0));
+        send(user, ReminderCommand.UNKNOWN.aliases.getFirst());
     }
 
     public void notifyAdmin(String text) {
@@ -99,6 +100,13 @@ public class Notifier {
         SendMessage sendMessageRequest = new SendMessage(user.getId(), DEFAULT_DELAY_REQUEST.text)
                         .replyMarkup(new ForceReply(true));
         bot.execute(sendMessageRequest);
+    }
+
+    private void notifyScheduleCreated(TelegramUser user, Instant targetInstant) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String message = "Scheduled for " + targetInstant.atZone(ZoneId.systemDefault()).format(formatter) + " " + ZoneId.systemDefault();
+        send(user, message);
+        log.info(message);
     }
 
     private void send(TelegramUser user, String text) {
